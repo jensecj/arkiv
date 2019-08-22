@@ -1,0 +1,6 @@
+[submodule "lib/warcat"]
+	path = lib/warcat
+	url = https://github.com/chfoo/warcat.git
+[submodule "lib/wpull"]
+	path = lib/wpull
+	url = https://github.com/ArchiveTeam/ludios_wpull.git
