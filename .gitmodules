@@ -4,3 +4,6 @@
 [submodule "lib/wpull"]
 	path = lib/wpull
 	url = https://github.com/ArchiveTeam/ludios_wpull.git
+[submodule "lib/ArchiveTools"]
+	path = lib/ArchiveTools
+	url = https://github.com/recrm/ArchiveTools.git
