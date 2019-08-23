@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -lt 1 ]; then
-    echo "usage: play-warc <warc archive>"
+    echo "usage: browse-warc <WARC file>"
     exit 1
 fi
 
