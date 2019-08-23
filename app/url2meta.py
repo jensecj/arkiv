@@ -12,7 +12,7 @@ def gather_meta(url):
 
     data = requests.get(url)
     html = bs4.BeautifulSoup(data.text, features="html.parser")
-    title = html.title.text
+    title = html.title.text.strip()
 
     meta_data = {
         "url": url,
