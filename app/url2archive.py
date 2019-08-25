@@ -4,20 +4,10 @@ import subprocess
 import shutil
 
 from config import USER_AGENT
+from shell_utils import shell_cmd
 
 
-def _shell_cmd(cmd):
-    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
-    for output in iter(popen.stdout.readline, ""):
-        print(output)
-
-    popen.stdout.close()
-    return_code = popen.wait()
-
-    return return_code
-
-
-def _download_archive(url):
+def _download_archive(config, url):
     print("downloading website...")
 
     args = [
@@ -26,6 +16,7 @@ def _download_archive(url):
         "--adjust-extension",
         "-e",
         "robots=off",
+        "--progress=bar",
         "--show-progress",
         "--page-requisites",
         "--no-verbose",
@@ -36,9 +27,14 @@ def _download_archive(url):
         "--user-agent=Mozilla",
     ]
 
-    cmd = ["wget"] + args + [url]
+    extra_args = []
+    if config.get("exclude_domains"):
+        domains = ",".join(config["exclude_domains"])
+        extra_args = extra_args + ["--exclude-domains", domains]
 
-    return_code = _shell_cmd(cmd)
+    cmd = ["wget"] + args + extra_args + [url]
+
+    return_code, stderr = shell_cmd(cmd)
 
     if return_code and return_code != 5:
         errors = [
@@ -56,7 +52,7 @@ def _download_archive(url):
         err = errors[return_code]
 
         raise Exception(
-            f"Failed to download website. return code: {return_code} ({err}). stderr: {popen.stderr}"
+            f"Failed to download website. return code: {return_code} ({err}). stderr: {stderr}"
         )
 
     if return_code == 5:
@@ -69,7 +65,7 @@ def _compress_archive(path):
     args = ["-czf"]
     cmd = ["tar"] + args + ["archive.tar.gz", path]
 
-    return_code = _shell_cmd(cmd)
+    return_code, stderr = shell_cmd(cmd)
 
     if return_code:
         errors = ["no error", "some files changed", "fatal error"]
@@ -86,18 +82,19 @@ def _compress_archive(path):
             )
 
 
-def generate_archive(url):
+def generate_archive(config, url):
     print("generating website archive...")
 
     print("=====")
 
     try:
-        _download_archive(url)
+        _download_archive(config, url)
 
         path = os.path.join(os.path.curdir, "archive/")
         _compress_archive(path)
+    except KeyboardInterrupt:
+        print("user interrupted handler, skipping...")
     except Exception as error:
-        err = repr(error)
-        print(f"ERROR: {err}")
+        print(repr(error))
 
     print("=====")
