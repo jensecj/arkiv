@@ -9,6 +9,7 @@ import json
 from url2meta import gather_meta
 from url2links import gather_links
 from url2readable import generate_readable
+from url2singlefile import generate_singlefile
 from url2img import generate_images
 from url2pdf import generate_pdfs
 from url2archive import generate_archive
@@ -20,6 +21,8 @@ async def process(config, url):
     gather_meta(url)
     gather_links(url)
     generate_readable(url)
+    generate_singlefile(url)
+
     await generate_images(url)
     await generate_pdfs(url)
 
