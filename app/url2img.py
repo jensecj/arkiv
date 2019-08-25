@@ -9,9 +9,10 @@ async def generate_images(url):
     page = await context.newPage()
 
     await page.setJavaScriptEnabled(False)
-    await page.setViewport({"width": 1200, "height": 800})
-    await page.emulateMedia("screen")
     await page.goto(url)
+
+    await page.emulateMedia("screen")
+    await page.setViewport({"width": 1200, "height": 800})
 
     print("generating thumbnail...")
     await page.screenshot({"path": "thumbnail.png"})
