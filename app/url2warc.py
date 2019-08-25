@@ -2,13 +2,11 @@ import sys
 import subprocess
 
 from config import USER_AGENT
+from shell_utils import shell_cmd
 
 
-def generate_warc(url):
-    print("generating WARC archive...")
-
+def _generate(config, url):
     args = [
-        url,
         "--warc-file",
         "site",
         "--no-check-certificate",
@@ -38,20 +36,32 @@ def generate_warc(url):
         "2",
     ]
 
-    cmd = ["wpull"] + args
+    extra_args = []
+    if config.get("exclude_domains"):
+        domains = ",".join(config["exclude_domains"])
+        extra_args = extra_args + ["--exclude-domains", domains]
+        extra_args = extra_args + ["--exclude-hostnames", domains]
+
+    cmd = ["wpull"] + args + extra_args + [url]
+
+    return_code, stderr = shell_cmd(cmd)
+
+    if return_code:
+        raise Exception(
+            f"failed to generate WARC. return code: {return_code}. stderr: {stderr}"
+        )
+
+
+def generate_warc(config, url):
+    print("generating WARC archive...")
 
     print("=====")
 
-    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
-    for output in iter(popen.stdout.readline, ""):
-        print(output)
-    popen.stdout.close()
-
-    return_code = popen.wait()
-
-    if return_code:
-        print("Error generating WARC archive!")
-        print(popen.stderr)
-        sys.exit()
+    try:
+        _generate(config, url)
+    except KeyboardInterrupt:
+        print("user interrupted handler, skipping...")
+    except Exception as error:
+        print(repr(error))
 
     print("=====")
