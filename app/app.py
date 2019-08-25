@@ -15,6 +15,8 @@ from url2pdf import generate_pdfs
 from url2archive import generate_archive
 from url2warc import generate_warc
 
+from links2pdfs import extract_pdfs
+
 
 # TODO: wrap each section in an error handler
 async def process(config, url):
@@ -33,6 +35,8 @@ async def process(config, url):
         with open(links_file, "r") as f:
             links = json.load(f)
 
+    if links:
+        extract_pdfs(config, links)
     generate_warc(config, url)
     generate_archive(config, url)
 
