@@ -23,6 +23,7 @@ def _download_pdf(url):
         "--show-progress",
         "--wait=1",
         "--random-wait",
+        "--tries=5",
         "--user-agent=Mozilla",
         "-O",
         filename,
