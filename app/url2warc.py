@@ -2,7 +2,7 @@ import sys
 import subprocess
 
 from config import USER_AGENT
-from shell_utils import shell_cmd
+from shell_utils import shell
 
 
 def _generate(config, url):
@@ -44,7 +44,7 @@ def _generate(config, url):
 
     cmd = ["wpull"] + args + extra_args + [url]
 
-    return_code, stderr = shell_cmd(cmd)
+    return_code, stdout, stderr = shell(cmd)
 
     if return_code:
         raise Exception(

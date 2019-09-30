@@ -3,7 +3,7 @@ import sys
 import subprocess
 from urllib.parse import urlparse, urljoin
 
-from shell_utils import shell_cmd
+from shell_utils import shell
 
 
 def _download_pdf(url):
@@ -30,7 +30,7 @@ def _download_pdf(url):
 
     cmd = ["wget"] + args + [url]
 
-    return_code, stderr = shell_cmd(cmd)
+    return_code, stdout, stderr = shell(cmd)
 
     if return_code:
         print(

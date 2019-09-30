@@ -4,7 +4,7 @@ import subprocess
 import shutil
 
 from config import USER_AGENT
-from shell_utils import shell_cmd
+from shell_utils import shell
 
 
 def _download_archive(config, url):
@@ -34,7 +34,7 @@ def _download_archive(config, url):
 
     cmd = ["wget"] + args + extra_args + [url]
 
-    return_code, stderr = shell_cmd(cmd)
+    return_code, stdout, stderr = shell(cmd)
 
     if return_code and return_code != 5:
         errors = [
@@ -65,7 +65,7 @@ def _compress_archive(path):
     args = ["-czf"]
     cmd = ["tar"] + args + ["archive.tar.gz", path]
 
-    return_code, stderr = shell_cmd(cmd)
+    return_code, stdout, stderr = shell(cmd)
 
     if return_code:
         errors = ["no error", "some files changed", "fatal error"]

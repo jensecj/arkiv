@@ -1,12 +1,12 @@
-from shell_utils import shell_cmd
+from shell_utils import shell
 
 
 def _generate(url):
     # TODO: call submodule
     args = [url, "singlefile.html"]
-    cmd = ["single-file"] + args
+    cmd = ["single-file", "--browser-executable-path", "/usr/bin/chromium"] + args
 
-    return_code, stderr = shell_cmd(cmd)
+    return_code, stdout, stderr = shell(cmd)
 
     if return_code:
         raise Exception(

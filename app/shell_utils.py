@@ -1,12 +1,31 @@
 import subprocess
 
 
-def shell_cmd(cmd):
-    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
-    for output in iter(popen.stdout.readline, ""):
-        print(output)
+def shell(cmd, input=None, log=True):
+    popen = subprocess.Popen(
+        cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, universal_newlines=True
+    )
 
-    popen.stdout.close()
+    if input:
+        if not isinstance(input, list):
+            input = [input]
+
+        for i in input:
+            popen.stdin.write(i)
+            popen.stdin.flush()
+
+        popen.stdin.close()
+
+    output = ""
+    if log:
+        for o in iter(popen.stdout.readline, ""):
+            output.append(o)
+            print(o)
+    else:
+        output = popen.stdout.read()
+
     return_code = popen.wait()
 
-    return return_code, popen.stderr
+    err = popen.stderr.read() if popen.stderr else None
+
+    return return_code, output, err
