@@ -44,7 +44,7 @@ async def process(config, url):
 
 
 def read_config():
-    config_file = os.path.expanduser("~/.arkiver")
+    config_file = os.environ.get("ARKIVER_CONFIG") or os.path.expanduser("~/.arkiver")
     if os.path.isfile(config_file):
         with open(config_file, "r") as f:
             return json.load(f)
