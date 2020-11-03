@@ -48,6 +48,7 @@ async def process(config, url):
 
     if links:
         extract_pdfs(config, links)
+
     generate_warc(config, url)
     generate_archive(config, url)
 
