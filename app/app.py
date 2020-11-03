@@ -6,6 +6,8 @@ from urllib.parse import urlparse, urljoin
 import datetime
 import json
 
+import click
+
 from url2meta import gather_meta
 from url2links import gather_links
 from url2readable import generate_readable
@@ -16,6 +18,15 @@ from url2archive import generate_archive
 from url2warc import generate_warc
 
 from links2pdfs import extract_pdfs
+
+
+root_log = logging.getLogger()
+root_log.setLevel(logging.DEBUG)
+
+stream_handler = logging.StreamHandler()
+root_log.addHandler(stream_handler)
+
+log = logging.getLogger(__name__)
 
 
 # TODO: wrap each section in an error handler
@@ -40,7 +51,7 @@ async def process(config, url):
     generate_warc(config, url)
     generate_archive(config, url)
 
-    print("Archiving complete.")
+    log.info("Archiving complete.")
 
 
 def read_config():
@@ -50,13 +61,22 @@ def read_config():
             return json.load(f)
 
 
-def main():
-    if len(sys.argv) < 2:
-        print("usage: arkiver <url>")
-        sys.exit()
+def print_version(ctx, param, value):
+    if not value or ctx.resilient_parsing:
+        return
 
-    url = sys.argv[1]
-    print("archiving " + url)
+    version = open("__version__.py", "r").read().strip()
+    log.info(f"arkiver v{version}")
+    ctx.exit()
+
+
+CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
+@click.command(context_settings=CONTEXT_SETTINGS)
+@click.argument("url", type=str)
+@click.option("-v", "--verbose", help="")
+@click.option("-V", "--version", is_flag=True, callback=print_version, expose_value=False, is_eager=True)
+def main(url, verbose):
+    log.info("archiving " + url)
 
     config = read_config()
 
