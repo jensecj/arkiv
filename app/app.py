@@ -69,22 +69,23 @@ def main():
 
     link = urlparse(url)
 
-    path = date + "--" + link.netloc + link.path
+    # maybe store timestamped dirs in this path, instead of prefixing with date?
+    archive_path = date + "--" + link.netloc + link.path
     if link.query:
-        path = path + "?" + link.query
+        archive_path = archive_path + "?" + link.query
 
-    path = (
-        path.replace(".html", "")
+    archive_path = (
+        archive_path.replace(".html", "")
         .replace(".htm", "")
         .replace(".asp", "")
         .replace(".aspx", "")
         .replace("/", "_")[:75]
     )
 
-    if config.get("path"):
-        path = os.path.join(config["path"], path)
+    if p := config.get("path"):
+        path = os.path.join(os.path.expanduser(p), archive_path)
     else:
-        path = os.path.abspath(path)
+        path = os.path.abspath(archive_path)
 
     if not os.path.isdir(path):
         os.mkdir(path)
