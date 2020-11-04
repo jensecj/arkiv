@@ -1,8 +1,12 @@
 import sys
 import subprocess
+import logging
 
 from config import USER_AGENT
 from shell_utils import shell
+
+
+log = logging.getLogger(__name__)
 
 
 def _generate(config, url):
@@ -53,15 +57,11 @@ def _generate(config, url):
 
 
 def generate_warc(config, url):
-    print("generating WARC archive...")
-
-    print("=====")
+    log.info("generating WARC archive...")
 
     try:
         _generate(config, url)
     except KeyboardInterrupt:
-        print("user interrupted handler, skipping...")
+        log.info("user interrupted handler, skipping...")
     except Exception as error:
-        print(repr(error))
-
-    print("=====")
+        log.error(repr(error))

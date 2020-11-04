@@ -8,6 +8,8 @@ import bs4
 
 from shell_utils import shell
 
+log = logging.getLogger(__name__)
+
 
 def _get_first_webarchive_record(url):
     query = "http://web.archive.org/cdx/search/cdx?url="
@@ -18,10 +20,12 @@ def _get_first_webarchive_record(url):
     return_code, stdout, stderr = shell(cmd, log=False)
 
     if return_code:
-        print(f"failed to get first occurance from webarchive, skipping...")
+        log.warning(f"failed to get first occurance from webarchive, skipping...")
         return "unknown"
 
     record = stdout.replace("\n", " ").strip()
+    log.debug(f"{stdout=}")
+
     j = json.loads(record)
     timestamp = j[1][0] if j else False
     date = datetime.datetime.strptime(timestamp, "%Y%m%d%H%M%S").isoformat() if timestamp else ""
@@ -29,7 +33,7 @@ def _get_first_webarchive_record(url):
 
 
 def gather_meta(url):
-    print("fetching meta data...")
+    log.info("fetching meta data...")
 
     data = requests.get(url)
     html = bs4.BeautifulSoup(data.text, features="html.parser")

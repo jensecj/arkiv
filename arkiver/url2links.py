@@ -1,4 +1,5 @@
 import json
+import logging
 
 from bs4 import BeautifulSoup
 import urllib.request
@@ -6,9 +7,11 @@ from urllib.parse import urlparse, urljoin
 
 from config import USER_AGENT
 
+log = logging.getLogger(__name__)
+
 
 def gather_links(url):
-    print("gethering links...")
+    log.info("gathering links...")
 
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     resp = urllib.request.urlopen(req)

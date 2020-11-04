@@ -1,13 +1,16 @@
 import os
 import sys
 import subprocess
+import logging
 from urllib.parse import urlparse, urljoin
 
 from shell_utils import shell
 
+log = logging.getLogger(__name__)
+
 
 def _download_pdf(url):
-    print(f"downloading pdf: {url}")
+    log.info(f"downloading pdf: {url}")
     base = urlparse(url)
     basename = os.path.basename(base.path)
     filename = os.path.join("pdfs", basename)
@@ -34,7 +37,7 @@ def _download_pdf(url):
     return_code, stdout, stderr = shell(cmd)
 
     if return_code:
-        print(
+        log.error(
             f"failed to download, skipping. return_code: {return_code}. stderr: {stderr}"
         )
 
@@ -71,7 +74,7 @@ def _dedupe_links(links):
 
 
 def extract_pdfs(config, links):
-    print("downloading pdf files...")
+    log.info("downloading pdf files...")
 
     try:
 
@@ -93,6 +96,6 @@ def extract_pdfs(config, links):
         for l in _dedupe_links(pdf_links):
             _download_pdf(l)
     except KeyboardInterrupt:
-        print("user interrupted handler, skipping...")
+        log.info("user interrupted handler, skipping...")
     except Exception as error:
-        print(repr(error))
+        log.error(repr(error))

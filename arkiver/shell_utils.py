@@ -1,4 +1,7 @@
 import subprocess
+import logging
+
+log = logging.getLogger(__name__)
 
 
 def shell(cmd, input=None, log=True):
@@ -20,7 +23,7 @@ def shell(cmd, input=None, log=True):
     if log:
         for o in iter(popen.stdout.readline, ""):
             output.append(o)
-            print(o)
+            log.info(o)
     else:
         output = popen.stdout.read()
 

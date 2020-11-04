@@ -88,6 +88,7 @@ def main(url, verbose):
         .replace("/", "_")[:75]
     )
 
+    log.debug(f"{archive_path=}")
     if p := config.get("archive"):
         path = os.path.join(os.path.expanduser(p), archive_path)
     else:

@@ -2,13 +2,16 @@ import os
 import sys
 import subprocess
 import shutil
+import logging
 
 from config import USER_AGENT
 from shell_utils import shell
 
+log = logging.getLogger(__name__)
+
 
 def _download_archive(config, url):
-    print("downloading website...")
+    log.info("downloading website...")
 
     args = [
         "--convert-links",
@@ -56,11 +59,11 @@ def _download_archive(config, url):
         )
 
     if return_code == 5:
-        print("failed to validate SSL, trying to continue anyway...")
+        log.warning("failed to validate SSL, trying to continue anyway...")
 
 
 def _compress_archive(path):
-    print("compressing into archive...")
+    log.info("compressing into archive...")
 
     args = ["-czf"]
     cmd = ["tar"] + args + ["archive.tar.gz", path]
@@ -77,15 +80,13 @@ def _compress_archive(path):
         try:
             shutil.rmtree(path)
         except OSError as e:
-            print(
+            log.error(
                 "error removing website directory: %s - %s." % (e.filename, e.strerror)
             )
 
 
 def generate_archive(config, url):
-    print("generating website archive...")
-
-    print("=====")
+    log.info("generating website archive...")
 
     try:
         _download_archive(config, url)
@@ -93,8 +94,6 @@ def generate_archive(config, url):
         path = os.path.join(os.path.curdir, "archive/")
         _compress_archive(path)
     except KeyboardInterrupt:
-        print("user interrupted handler, skipping...")
+        log.info("user interrupted handler, skipping...")
     except Exception as error:
-        print(repr(error))
-
-    print("=====")
+        log.error(repr(error))

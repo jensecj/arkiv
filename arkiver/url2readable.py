@@ -2,12 +2,15 @@ import requests
 from readability import Document
 from html2text import HTML2Text
 import re
+import logging
 
 from config import USER_AGENT
 
+log = logging.getLogger(__name__)
+
 
 def generate_readable(url):
-    print("generating readable file...")
+    log.info("generating readable file...")
 
     headers = requests.utils.default_headers()
     headers.update({"User-Agent": USER_AGENT})

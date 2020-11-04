@@ -1,4 +1,8 @@
+import logging
+
 from shell_utils import shell
+
+log = logging.getLogger(__name__)
 
 
 def _generate(url):
@@ -19,6 +23,6 @@ def generate_singlefile(url):
     try:
         _generate(url)
     except KeyboardInterrupt:
-        print("user interrupted handler, skipping...")
+        log.warning("user interrupted handler, skipping...")
     except Exception as error:
-        print(repr(error))
+        log.error(repr(error))
