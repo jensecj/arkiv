@@ -68,9 +68,12 @@ def print_version(ctx, param, value):
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 @click.command(context_settings=CONTEXT_SETTINGS)
 @click.argument("url", type=str)
-@click.option("-v", "--verbose", help="")
-@click.option("-V", "--version", is_flag=True, callback=print_version, expose_value=False, is_eager=True)
+@click.option("-v", "--verbose", help="", is_flag=True)
+@click.option("-V", "--version", is_flag=True, callback=print_version, expose_value=False, is_eager=True,)
 def main(url, verbose):
+    if verbose:
+        os.environ[CFG.ENV_VERBOSE] = "true"
+
     log.info("archiving " + url)
 
     config = CFG.load()
