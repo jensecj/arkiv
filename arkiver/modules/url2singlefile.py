@@ -1,6 +1,6 @@
 import logging
 
-from shell_utils import shell
+from ..utils import shell
 
 log = logging.getLogger(__name__)
 

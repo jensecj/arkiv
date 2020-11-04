@@ -4,7 +4,7 @@ import subprocess
 import logging
 from urllib.parse import urlparse, urljoin
 
-from shell_utils import shell
+from ..utils import shell
 
 log = logging.getLogger(__name__)
 

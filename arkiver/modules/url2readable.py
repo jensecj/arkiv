@@ -4,7 +4,7 @@ from html2text import HTML2Text
 import re
 import logging
 
-from config import USER_AGENT
+from ..config import USER_AGENT
 
 log = logging.getLogger(__name__)
 

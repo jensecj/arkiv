@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 import urllib.request
 from urllib.parse import urlparse, urljoin
 
-from config import USER_AGENT
+from ..config import USER_AGENT
 
 log = logging.getLogger(__name__)
 

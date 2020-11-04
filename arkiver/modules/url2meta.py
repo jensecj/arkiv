@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 import requests
 import bs4
 
-from shell_utils import shell
+from ..utils import shell
 
 log = logging.getLogger(__name__)
 

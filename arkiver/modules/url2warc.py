@@ -2,8 +2,8 @@ import sys
 import subprocess
 import logging
 
-from config import USER_AGENT
-from shell_utils import shell
+from ..config import USER_AGENT
+from ..utils import shell
 
 
 log = logging.getLogger(__name__)

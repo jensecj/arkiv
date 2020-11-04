@@ -6,8 +6,8 @@ import json
 
 import click
 
-import config as CFG
-from core import archive
+from . import config as CFG
+from .core import archive
 
 log = logging.getLogger(__name__)
 
