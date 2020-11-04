@@ -82,10 +82,11 @@ def _from_environment():
 
 def load():
     config_file = _get_config_file()
-    log.debug(config_file)
+    log.debug(f"{config_file=}")
 
     config = {}
     config.update(_from_file(config_file))
     config.update(_from_environment())
+    log.debug(f"{config=}")
 
     return config

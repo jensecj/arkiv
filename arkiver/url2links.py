@@ -28,5 +28,8 @@ def gather_links(url):
     internal = [l for l in links if base in l]
     external = [l for l in links if base not in l]
 
+    all_links = {"internal": internal, "external": external}
     with open("links.json", "w") as f:
-        json.dump({"internal": internal, "external": external}, f, indent=4)
+        json.dump(all_links, f, indent=4)
+
+    return all_links if (internal or external) else None

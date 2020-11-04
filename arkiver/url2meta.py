@@ -28,15 +28,16 @@ def _get_first_webarchive_record(url):
 
     if return_code:
         log.warning(f"failed to get first occurance from webarchive, skipping...")
-        return "unknown"
+        return None
 
-    record = stdout.replace("\n", " ").strip()
-    log.debug(f"{stdout=}")
+    record = stdout.replace("\n", "").strip()
+    log.debug(f"{record=}")
 
-    j = json.loads(record)
-    timestamp = j[1][0] if j else False
-    date = datetime.datetime.strptime(timestamp, "%Y%m%d%H%M%S").isoformat() if timestamp else ""
-    return date
+    data = json.loads(record)
+    timestamp = data[1][0] if data else False
+
+    if timestamp:
+        return datetime.datetime.strptime(timestamp, "%Y%m%d%H%M%S").isoformat()
 
 
 def gather_meta(url):
@@ -45,7 +46,7 @@ def gather_meta(url):
     data = requests.get(url)
     html = bs4.BeautifulSoup(data.text, features="html.parser")
     title = html.title.text.strip()
-    first = _get_first_webarchive_record(url)
+    first = _get_first_webarchive_record(url) or ""
 
     meta_data = {
         "url": url,
@@ -56,3 +57,5 @@ def gather_meta(url):
 
     with open("meta.json", "w") as f:
         json.dump(meta_data, f, indent=4)
+
+    return meta_data
