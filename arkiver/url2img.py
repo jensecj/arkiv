@@ -15,18 +15,20 @@ def generate_screenshots(url):
     profile.set_preference("javascript.enabled", False)
     profile.set_preference("network.cookie.cookieBehavior", 2)
 
-    driver = webdriver.Firefox(
+    with webdriver.Firefox(
         firefox_profile=profile, firefox_options=options, log_path=os.devnull
-    )
+    ) as driver:
+        driver.get(url)
 
-    driver.get(url)
+        log.info("generating thumbnail...")
+        driver.save_screenshot("thumb.png")
 
-    log.info("generating thumbnail...")
-    driver.save_screenshot("thumbnail.png")
+        log.info("generating <html> image...")
+        html = driver.find_element_by_tag_name("html")
+        html.screenshot("html.png")
 
-    log.info("generating full-page image...")
-    body = driver.find_element_by_tag_name("body")
-    body.screenshot("fullpage.png")
+        log.info("generating <body> image...")
+        body = driver.find_element_by_tag_name("body")
+        body.screenshot("body.png")
 
-    driver.delete_all_cookies()
-    driver.quit()
+        driver.delete_all_cookies()
