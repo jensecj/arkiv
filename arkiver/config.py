@@ -18,7 +18,7 @@ LOG_CONFIG = {
             "class": "logging.StreamHandler",
             "stream": "ext://sys.stdout",
         },
-        "debug": {
+        "extended": {
             "formatter": "standard",
             "class": "logging.StreamHandler",
             "stream": "ext://sys.stdout",
@@ -33,8 +33,8 @@ LOG_CONFIG = {
         "readability": {"level": "WARNING", "propagate": False},
     },
     "root": {
-        "handlers": ["debug"],
-        "level": "DEBUG",
+        "handlers": ["default"],
+        "level": "INFO",
         "propagate": False,
     },
 }
@@ -65,7 +65,9 @@ def _from_file(config_file):
 
 def _from_environment():
     cfg = {
-        "verbose": bool(os.environ.get(ENV_VERBOSE)),
+        "verbose": int(os.environ.get(ENV_VERBOSE))
+        if os.environ.get(ENV_VERBOSE)
+        else 0,
         "archive": os.environ.get(ENV_ARCHIVE),
     }
 
