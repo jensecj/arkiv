@@ -19,6 +19,7 @@ from url2warc import generate_warc
 
 from links2pdfs import extract_pdfs
 
+import config as CFG
 
 root_log = logging.getLogger()
 root_log.setLevel(logging.DEBUG)
@@ -55,13 +56,6 @@ async def process(config, url):
     log.info("Archiving complete.")
 
 
-def read_config():
-    config_file = os.environ.get("ARKIVER_CONFIG") or os.path.expanduser("~/.arkiver")
-    if os.path.isfile(config_file):
-        with open(config_file, "r") as f:
-            return json.load(f)
-
-
 def print_version(ctx, param, value):
     if not value or ctx.resilient_parsing:
         return
@@ -79,7 +73,7 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 def main(url, verbose):
     log.info("archiving " + url)
 
-    config = read_config()
+    config = CFG.load()
 
     if config.get("timestamp-output"):
         logging.basicConfig(

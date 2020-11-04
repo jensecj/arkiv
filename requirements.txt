@@ -4,3 +4,4 @@ html2text
 pyppeteer
 click
 readability-lxml
+xdg
