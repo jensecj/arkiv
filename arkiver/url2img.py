@@ -2,9 +2,7 @@ import os
 import logging
 
 from selenium import webdriver
-from selenium.webdriver.remote.remote_connection import LOGGER
 
-LOGGER.setLevel(logging.WARNING)
 
 log = logging.getLogger(__name__)
 

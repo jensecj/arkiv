@@ -1,6 +1,5 @@
 import sys
 import os
-import asyncio
 import logging
 from urllib.parse import urlparse, urljoin
 import datetime
@@ -12,7 +11,7 @@ from url2meta import gather_meta
 from url2links import gather_links
 from url2readable import generate_readable
 from url2singlefile import generate_singlefile
-from url2img import generate_images
+from url2img import generate_screenshots
 from url2pdf import generate_pdfs
 from url2archive import generate_archive
 from url2warc import generate_warc
@@ -27,25 +26,28 @@ root_log.setLevel(logging.DEBUG)
 stream_handler = logging.StreamHandler()
 root_log.addHandler(stream_handler)
 
+# silence the selenium logger
+from selenium.webdriver.remote.remote_connection import LOGGER as selenium_log
+
+selenium_log.setLevel(logging.WARNING)
+
+# silence the urllib logger
+from urllib3.connectionpool import log as urllib_log
+
+urllib_log.setLevel(logging.WARNING)
+
+
 log = logging.getLogger(__name__)
 
 
 # TODO: wrap each section in an error handler
-async def process(config, url):
-    gather_meta(url)
-    gather_links(url)
-    generate_readable(url)
-    generate_singlefile(url)
-
-    await generate_pdfs(url)
+def process(config, url):
+    meta = gather_meta(url)
+    links = gather_links(url)
+    # generate_readable(url)
+    # generate_singlefile(url)
     generate_screenshots(url)
-
-    links_file = os.path.abspath("links.json")
-    links = []
-
-    if os.path.isfile(links_file):
-        with open(links_file, "r") as f:
-            links = json.load(f)
+    # await generate_pdfs(url)
 
     if links:
         extract_pdfs(config, links)
@@ -110,7 +112,7 @@ def main(url, verbose):
 
     os.chdir(path)
 
-    asyncio.get_event_loop().run_until_complete(process(config, url))
+    process(config, url)
 
 
 if __name__ == "__main__":
