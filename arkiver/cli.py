@@ -37,8 +37,8 @@ async def process(config, url):
     generate_readable(url)
     generate_singlefile(url)
 
-    await generate_images(url)
     await generate_pdfs(url)
+    generate_screenshots(url)
 
     links_file = os.path.abspath("links.json")
     links = []

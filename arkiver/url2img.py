@@ -1,23 +1,34 @@
-import asyncio
+import os
+import logging
 
-from pyppeteer import launch
+from selenium import webdriver
+from selenium.webdriver.remote.remote_connection import LOGGER
+
+LOGGER.setLevel(logging.WARNING)
+
+log = logging.getLogger(__name__)
 
 
-async def generate_images(url):
-    browser = await launch()
-    context = await browser.createIncognitoBrowserContext()
-    page = await context.newPage()
+def generate_screenshots(url):
+    options = webdriver.FirefoxOptions()
+    options.set_headless()
 
-    await page.setJavaScriptEnabled(False)
-    await page.goto(url)
+    profile = webdriver.FirefoxProfile()
+    profile.set_preference("javascript.enabled", False)
+    profile.set_preference("network.cookie.cookieBehavior", 2)
 
-    await page.emulateMedia("screen")
-    await page.setViewport({"width": 1200, "height": 800})
+    driver = webdriver.Firefox(
+        firefox_profile=profile, firefox_options=options, log_path=os.devnull
+    )
 
-    print("generating thumbnail...")
-    await page.screenshot({"path": "thumbnail.png"})
+    driver.get(url)
 
-    print("generating full-page image...")
-    await page.screenshot({"path": "screenshot.png", "fullPage": True})
+    log.info("generating thumbnail...")
+    driver.save_screenshot("thumbnail.png")
 
-    await browser.close()
+    log.info("generating full-page image...")
+    body = driver.find_element_by_tag_name("body")
+    body.screenshot("fullpage.png")
+
+    driver.delete_all_cookies()
+    driver.quit()
