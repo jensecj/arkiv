@@ -2,7 +2,6 @@ import sys
 import os
 import logging, logging.config
 from urllib.parse import urlparse, urljoin
-import datetime
 import json
 
 import click
@@ -26,7 +25,7 @@ log = logging.getLogger(__name__)
 
 
 # TODO: wrap each section in an error handler
-def process(config, url):
+def archive(config, url):
     meta = gather_meta(url)
     links = gather_links(url)
     # generate_readable(url)
@@ -65,19 +64,14 @@ def main(url, verbose):
 
     config = CFG.load()
 
-    if config.get("timestamp-output"):
-        logging.basicConfig(
-            format="%(asctime)s %(message)s:", datefmt="%Y-%d-%m %H:%M:%S"
-        )
-
-    date = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M")
-
     link = urlparse(url)
+    loc = link.netloc.strip("/")
+    path = link.path.strip("/")
 
     # maybe store timestamped dirs in this path, instead of prefixing with date?
-    archive_path = date + "--" + link.netloc + link.path
-    if link.query:
-        archive_path = archive_path + "?" + link.query
+    archive_path = f"{loc}--{path}"
+    if q := link.query:
+        archive_path = archive_path + "?" + q
 
     archive_path = (
         archive_path.replace("www.", "")
@@ -85,10 +79,13 @@ def main(url, verbose):
         .replace(".htm", "")
         .replace(".asp", "")
         .replace(".aspx", "")
-        .replace("/", "_")[:75]
+        .replace(".php", "")
+        .replace("/", "_")
     )
 
+    archive_path = archive_path[:75]
     log.debug(f"{archive_path=}")
+
     if p := config.get("archive"):
         path = os.path.join(os.path.expanduser(p), archive_path)
     else:
@@ -99,7 +96,7 @@ def main(url, verbose):
 
     os.chdir(path)
 
-    process(config, url)
+    archive(config, url)
 
 
 if __name__ == "__main__":

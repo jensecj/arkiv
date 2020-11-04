@@ -39,7 +39,6 @@ LOG_CONFIG = {
     },
 }
 
-
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"
 
 ENV_VERBOSE = "ARKIVER_VERBOSE"
@@ -70,6 +69,7 @@ def _from_environment():
         "archive": os.environ.get(ENV_ARCHIVE),
     }
 
+    # only return keys with valid values
     return {k: v for k, v in cfg.items() if v is not None}
 
 
