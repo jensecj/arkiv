@@ -1,7 +1,9 @@
+xdg
+click
 requests
 beautifulsoup4
-html2text
-pyppeteer
-click
+gitpython
+
 readability-lxml
-xdg
+pyppeteer
+selenium
