@@ -1,6 +1,6 @@
 import sys
 import os
-import logging
+import logging, logging.config
 from urllib.parse import urlparse, urljoin
 import datetime
 import json
@@ -20,22 +20,7 @@ from links2pdfs import extract_pdfs
 
 import config as CFG
 
-root_log = logging.getLogger()
-root_log.setLevel(logging.DEBUG)
-
-stream_handler = logging.StreamHandler()
-root_log.addHandler(stream_handler)
-
-# silence the selenium logger
-from selenium.webdriver.remote.remote_connection import LOGGER as selenium_log
-
-selenium_log.setLevel(logging.WARNING)
-
-# silence the urllib logger
-from urllib3.connectionpool import log as urllib_log
-
-urllib_log.setLevel(logging.WARNING)
-
+logging.config.dictConfig(CFG.LOG_CONFIG)
 
 log = logging.getLogger(__name__)
 

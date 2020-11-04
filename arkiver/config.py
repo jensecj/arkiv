@@ -5,13 +5,44 @@ import logging
 
 from xdg import xdg_config_home
 
-log = logging.getLogger(__name__)
+LOG_CONFIG = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "simple": {"format": "%(message)s"},
+        "standard": {"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"},
+    },
+    "handlers": {
+        "default": {
+            "formatter": "simple",
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout",
+        }
+    },
+    "loggers": {
+        "urllib3.connectionpool": {"level": "WARNING", "propagate": False},
+        "selenium.webdriver.remote.remote_connection": {
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "readability": {"level": "WARNING", "propagate": False},
+    },
+    "root": {
+        "handlers": ["default"],
+        "level": "INFO",
+        "propagate": False,
+    },
+}
+
 
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"
 
 ENV_VERBOSE = "ARKIVER_VERBOSE"
 ENV_CONFIG = "ARKIVER_CONFIG"
 ENV_ARCHIVE = "ARKIVER_ARCHIVE"
+
+
+log = logging.getLogger(__name__)
 
 
 def _get_config_file():
