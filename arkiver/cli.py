@@ -66,17 +66,17 @@ def main(url, verbose):
 
     config = CFG.load()
 
+    log.info(f"archiving {url}")
+
     link = urlparse(url)
     loc = link.netloc.strip("/")
     path = link.path.strip("/")
 
-    # maybe store timestamped dirs in this path, instead of prefixing with date?
-    archive_path = f"{loc}--{path}"
-    if q := link.query:
-        archive_path = archive_path + "?" + q
+    archive_dir = f"{loc}--{path}"
 
-    archive_path = (
-        archive_path.replace("www.", "")
+    # replace common parts of the path
+    archive_dir = (
+        archive_dir.replace("www.", "")
         .replace(".html", "")
         .replace(".htm", "")
         .replace(".asp", "")
@@ -85,18 +85,26 @@ def main(url, verbose):
         .replace("/", "_")
     )
 
-    archive_path = archive_path[:75]
-    log.debug(f"{archive_path=}")
+    # append fragment and query parts of the path
+    if fragment := link.fragment:
+        archive_dir = archive_dir + "#" + fragment
+    if query := link.query:
+        archive_dir = archive_dir + "?" + query
+
+    # cap the length of the archives name
+    archive_dir = archive_dir[:75]
+
+    log.debug(f"{archive_dir=}")
 
     if p := config.get("archive"):
-        path = os.path.join(os.path.expanduser(p), archive_path)
+        archive_path = os.path.join(os.path.expanduser(p), archive_dir)
     else:
-        path = os.path.abspath(archive_path)
+        archive_path = os.path.abspath(archive_dir)
 
-    if not os.path.isdir(path):
-        os.mkdir(path)
+    if not os.path.isdir(archive_path):
+        os.mkdir(archive_path)
 
-    os.chdir(path)
+    os.chdir(archive_path)
 
     archive(config, url)
 
