@@ -2,6 +2,7 @@ import time
 import datetime
 import json
 import logging
+from urllib.parse import urlparse
 
 import requests
 import bs4
@@ -12,11 +13,17 @@ log = logging.getLogger(__name__)
 
 
 def _get_first_webarchive_record(url):
+    link = urlparse(url)
+    log.debug(f"{link=}")
+
+    scheme = f"{link.scheme}://" if link.scheme else ""
+
     query = "http://web.archive.org/cdx/search/cdx?url="
     params = "&fl=timestamp&output=json&limit=1"
-    url = f"{query}{url}{params}"
+    wa_url = f"{query}{scheme}{link.netloc}{link.path}{params}"
+    log.debug(f"{wa_url=}")
 
-    cmd = ["curl", "-s", url]
+    cmd = ["curl", "-s", wa_url]
     return_code, stdout, stderr = shell(cmd, log=False)
 
     if return_code:
