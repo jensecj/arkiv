@@ -50,11 +50,16 @@ log = logging.getLogger(__name__)
 
 
 def _get_config_file():
-    return (
-        os.environ.get(ENV_CONFIG)
-        or os.path.join(xdg_config_home(), "arkiver/arkiver.conf")
-        or os.path.expanduser("~/.arkiver")
-    )
+    paths = [
+        os.environ.get(ENV_CONFIG),
+        os.path.join(xdg_config_home(), "arkiver/arkiver.conf"),
+        os.path.expanduser("~/.arkiver/arkiver.conf"),
+        os.path.expanduser("~/.arkiver"),
+    ]
+
+    for p in paths:
+        if p and os.path.isfile(p):
+            return p
 
 
 def _from_file(config_file):
