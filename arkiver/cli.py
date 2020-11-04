@@ -40,7 +40,7 @@ def process(config, url):
     generate_warc(config, url)
     generate_archive(config, url)
 
-    log.info("Archiving complete.")
+    log.info("Archiving complete")
 
 
 def print_version(ctx, param, value):
@@ -80,14 +80,15 @@ def main(url, verbose):
         archive_path = archive_path + "?" + link.query
 
     archive_path = (
-        archive_path.replace(".html", "")
+        archive_path.replace("www.", "")
+        .replace(".html", "")
         .replace(".htm", "")
         .replace(".asp", "")
         .replace(".aspx", "")
         .replace("/", "_")[:75]
     )
 
-    if p := config.get("path"):
+    if p := config.get("archive"):
         path = os.path.join(os.path.expanduser(p), archive_path)
     else:
         path = os.path.abspath(archive_path)

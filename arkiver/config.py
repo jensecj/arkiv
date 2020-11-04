@@ -17,7 +17,12 @@ LOG_CONFIG = {
             "formatter": "simple",
             "class": "logging.StreamHandler",
             "stream": "ext://sys.stdout",
-        }
+        },
+        "debug": {
+            "formatter": "standard",
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout",
+        },
     },
     "loggers": {
         "urllib3.connectionpool": {"level": "WARNING", "propagate": False},
@@ -28,8 +33,8 @@ LOG_CONFIG = {
         "readability": {"level": "WARNING", "propagate": False},
     },
     "root": {
-        "handlers": ["default"],
-        "level": "INFO",
+        "handlers": ["debug"],
+        "level": "DEBUG",
         "propagate": False,
     },
 }
