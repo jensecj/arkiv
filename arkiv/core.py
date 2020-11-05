@@ -14,6 +14,8 @@ from .modules.url2img import generate_screenshots
 from .modules.url2archive import generate_archive
 from .modules.url2warc import generate_warc
 
+from .modules import monolith
+
 from .modules.links2repos import extract_repos
 from .modules.links2videos import extract_videos
 from .modules.links2images import extract_images
@@ -128,6 +130,7 @@ def archive(config, url):
     generate_readable(url)
     generate_screenshots(url)
     # generate_singlefile(url)
+    monolith.generate(url)
 
     if links:
         extract_pdfs(config, links)
