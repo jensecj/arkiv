@@ -25,8 +25,8 @@ def gather_links(url):
 
     base = urlparse(url).netloc
 
-    internal = [l for l in links if base in l]
-    external = [l for l in links if base not in l]
+    internal = sorted(set([l for l in links if base in l]))
+    external = sorted(set([l for l in links if base not in l]))
 
     all_links = {"internal": internal, "external": external}
     with open("links.json", "w") as f:
