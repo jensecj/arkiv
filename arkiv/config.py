@@ -49,6 +49,7 @@ log = logging.getLogger(__name__)
 
 
 def _get_config_file():
+    # paths to config file, in the ordere they're checked
     paths = [
         os.environ.get(ENV_CONFIG),
         os.path.join(xdg_config_home(), "arkiv/arkiv.conf"),
@@ -58,13 +59,12 @@ def _get_config_file():
 
     for p in paths:
         if p and os.path.isfile(p):
-            return p
+            return p  # use the first valid config file
 
 
 def _from_file(config_file):
-    if os.path.isfile(os.path.expanduser(config_file)):
-        with open(config_file, "r") as f:
-            return json.load(f)
+    with open(os.path.expanduser(config_file), "r") as f:
+        return json.load(f)
 
 
 def _from_environment():
