@@ -4,7 +4,7 @@ import logging
 import hashlib
 
 import git
-from git import Repo
+from git import Repo, Actor
 
 from .modules.url2meta import gather_meta
 from .modules.url2links import gather_links
@@ -70,6 +70,21 @@ def _get_archive_repo(archive_path):
     return repo
 
 
+def _commit_archive(archive_path, repo):
+    # add all archive changes to the index, not just checked in files
+    repo.git.add(all=True)
+
+    # NOTE: on prefixes: b is the `before' diff, a is `after'
+    # even if the docs have it the other way around
+
+    diff = repo.index.diff(repo.head.commit)
+    changed_files = [d.a_path for d in diff]
+    log.info("commiting: " + ", ".join(changed_files))
+
+    actor = Actor("Arkivist", "arkiv@arkiv.arkiv")
+    repo.index.commit("update", author=actor, committer=actor)
+
+
 def archive(config, url):
     log.info(f"archiving {url}")
 
@@ -112,6 +127,6 @@ def archive(config, url):
     # generate_warc(config, url)
     # generate_archive(config, url)
 
-    # TODO: commit all new files to git-repo
+    _commit_archive(archive_path, repo)
 
     log.info("Archiving complete")
