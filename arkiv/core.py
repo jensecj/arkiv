@@ -70,6 +70,11 @@ def _get_archive_repo(archive_path):
 
 
 def _commit_archive(archive_path, repo):
+    actor = Actor("Arkivist", "arkiv@arkiv.arkiv")
+
+    if not repo.heads:  # archive has no commits yet
+        repo.index.commit("created archive", author=actor, committer=actor)
+
     # add all archive changes to the index, not just checked in files
     repo.git.add(all=True)
 
@@ -90,7 +95,6 @@ def _commit_archive(archive_path, repo):
             diff_str = f"+{byte_diff}" if byte_diff >= 0 else f"{byte_diff}"
             log.debug(f"{d.b_path:<15}: {diff_str} bytes")
 
-    actor = Actor("Arkivist", "arkiv@arkiv.arkiv")
     repo.index.commit("update", author=actor, committer=actor)
 
 
@@ -111,7 +115,6 @@ def archive(config, url):
         os.mkdir(archive_path)
 
     repo = _get_archive_repo(archive_path)
-    log.debug(f"{repo=}")
 
     if repo.is_dirty(untracked_files=True):
         log.warning("git repo is dirty!")
