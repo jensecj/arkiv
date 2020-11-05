@@ -37,6 +37,7 @@ LOG_CONFIG = {
         },
     },
     "loggers": {
+        "git.cmd": {"level": "WARNING", "propagate": False},
         "urllib3.connectionpool": {"level": "WARNING", "propagate": False},
         "selenium.webdriver.remote.remote_connection": {
             "level": "WARNING",

@@ -3,6 +3,9 @@ from urllib.parse import urlparse
 import logging
 import hashlib
 
+import git
+from git import Repo
+
 from .modules.url2meta import gather_meta
 from .modules.url2links import gather_links
 from .modules.url2readable import generate_readable
@@ -55,6 +58,18 @@ def _build_archive_dir(url):
     return archive_dir
 
 
+def _get_archive_repo(archive_path):
+    try:
+        repo = Repo(archive_path)
+    except git.exc.InvalidGitRepositoryError:
+        log.info("repo does not exist, creating...")
+        repo = Repo.init(archive_path)
+
+    # TODO: if dir is a git-repo, validate that it is a proper archive
+
+    return repo
+
+
 def archive(config, url):
     log.info(f"archiving {url}")
 
@@ -71,8 +86,11 @@ def archive(config, url):
     if not os.path.isdir(archive_path):
         os.mkdir(archive_path)
 
-    # TODO: if the dir is not a git-repo, initialize it
-    # TODO: if dir is a git-repo, validate that it is a proper archive
+    repo = _get_archive_repo(archive_path)
+    log.debug(f"{repo=}")
+
+    if repo.is_dirty(untracked_files=True):
+        log.warning("git repo is dirty!")
 
     # we change the working dir, so relative outputs land in the correct location
     os.chdir(archive_path)
