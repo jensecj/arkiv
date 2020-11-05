@@ -10,7 +10,19 @@ LOG_CONFIG = {
     "disable_existing_loggers": False,
     "formatters": {
         "simple": {"format": "%(message)s"},
-        "standard": {"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"},
+        "standard": {
+            "format": "%(asctime)s [%(levelname)-7s] %(name)s:%(lineno)s: %(message)s"
+        },
+        "colored": {
+            "()": "colorlog.ColoredFormatter",
+            "format": "%(asctime)s %(log_color)s[%(levelname)-7s]%(reset)s %(white)s%(name)s:%(lineno)s%(reset)s: %(message)s",
+            "log_colors": {
+                "DEBUG": "cyan",
+                "INFO": "white",
+                "WARNING": "yellow",
+                "ERROR": "red",
+            },
+        },
     },
     "handlers": {
         "default": {
@@ -19,7 +31,7 @@ LOG_CONFIG = {
             "stream": "ext://sys.stdout",
         },
         "extended": {
-            "formatter": "standard",
+            "formatter": "colored",
             "class": "logging.StreamHandler",
             "stream": "ext://sys.stdout",
         },

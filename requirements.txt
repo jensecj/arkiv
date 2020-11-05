@@ -3,6 +3,7 @@ click
 requests
 beautifulsoup4
 gitpython
+colorlog
 
 readability-lxml
 pyppeteer
