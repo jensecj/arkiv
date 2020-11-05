@@ -1,3 +1,5 @@
+import os
+from urllib.parse import urlparse
 import logging
 
 from .modules.url2meta import gather_meta
@@ -18,8 +20,53 @@ from .modules.links2pdfs import extract_pdfs
 log = logging.getLogger(__name__)
 
 
-# TODO: wrap each section in an error handler
+def _build_archive_dir(url):
+    link = urlparse(url)
+    loc = link.netloc.strip("/")
+    path = link.path.strip("/")
+
+    archive_dir = f"{loc}--{path}"
+
+    # replace common parts of the path
+    archive_dir = (
+        archive_dir.replace("www.", "")
+        .replace(".html", "")
+        .replace(".htm", "")
+        .replace(".asp", "")
+        .replace(".aspx", "")
+        .replace(".php", "")
+        .replace("/", "_")
+    )
+
+    # append fragment and query parts of the path
+    if fragment := link.fragment:
+        archive_dir = archive_dir + "#" + fragment
+    if query := link.query:
+        archive_dir = archive_dir + "?" + query
+
+    # cap the length of the archives name
+    archive_dir = archive_dir[:75]
+
+    return archive_dir
+
+
 def archive(config, url):
+    log.info(f"archiving {url}")
+
+    archive_dir = _build_archive_dir(url)
+    if p := config.get("archive"):
+        archive_path = os.path.join(os.path.expanduser(p), archive_dir)
+    else:
+        archive_path = os.path.abspath(archive_dir)
+
+    log.debug(f"{archive_path=}")
+
+    if not os.path.isdir(archive_path):
+        os.mkdir(archive_path)
+
+    os.chdir(archive_path)
+
+    # TODO: wrap each section in an error handler
     meta = gather_meta(url)
     links = gather_links(url)
     generate_readable(url)
