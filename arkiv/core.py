@@ -11,7 +11,6 @@ from .modules.url2links import gather_links
 from .modules.url2readable import generate_readable
 from .modules.url2singlefile import generate_singlefile
 from .modules.url2img import generate_screenshots
-from .modules.url2pdf import generate_pdfs
 from .modules.url2archive import generate_archive
 from .modules.url2warc import generate_warc
 
@@ -126,7 +125,6 @@ def archive(config, url):
     generate_readable(url)
     generate_screenshots(url)
     # generate_singlefile(url)
-    # await generate_pdfs(url)
 
     if links:
         extract_pdfs(config, links)

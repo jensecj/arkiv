@@ -6,5 +6,4 @@ gitpython
 colorlog
 
 readability-lxml
-pyppeteer
 selenium
