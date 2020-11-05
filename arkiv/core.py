@@ -6,17 +6,16 @@ import hashlib
 import git
 from git import Repo, Actor
 
+from . import extractors
+from .extractors import meta, links
+
 from . import generators
 from .generators import readable, monolith, screenshots
 
 
-from .modules.url2meta import gather_meta
-from .modules.url2links import gather_links
 from .modules.url2singlefile import generate_singlefile
 from .modules.url2archive import generate_archive
 from .modules.url2warc import generate_warc
-
-
 from .modules.links2repos import extract_repos
 from .modules.links2videos import extract_videos
 from .modules.links2images import extract_images
@@ -126,9 +125,8 @@ def archive(config, url):
     os.chdir(archive_path)
 
     # TODO: wrap each section in an error handler
-    meta = gather_meta(url)
-    links = gather_links(url)
-    # generate_singlefile(url)
+    meta = extractors.meta.extract(url)
+    links = extractors.links.extract(url)
     generators.readable.generate(url)
     generators.monolith.generate(url)
     generators.screenshots.generate(url)

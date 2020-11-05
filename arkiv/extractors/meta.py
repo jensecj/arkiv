@@ -40,8 +40,8 @@ def _get_first_webarchive_record(url):
         return datetime.datetime.strptime(timestamp, "%Y%m%d%H%M%S").isoformat()
 
 
-def gather_meta(url):
-    log.info("fetching meta data...")
+def extract(url):
+    log.info("extracting meta data...")
 
     data = requests.get(url)
     html = bs4.BeautifulSoup(data.text, features="html.parser")

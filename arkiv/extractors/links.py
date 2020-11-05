@@ -10,8 +10,8 @@ from ..config import USER_AGENT
 log = logging.getLogger(__name__)
 
 
-def gather_links(url):
-    log.info("gathering links...")
+def extract(url):
+    log.info("extracting links...")
 
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     resp = urllib.request.urlopen(req)
