@@ -81,6 +81,16 @@ def _commit_archive(archive_path, repo):
     changed_files = [d.a_path for d in diff]
     log.info("commiting: " + ", ".join(changed_files))
 
+    for d in diff:
+        if d.b_blob is None:  # new file
+            log.debug(f"{d.a_path}: added")
+        elif d.a_blob is None:  # deleted file
+            log.debug(f"{d.b_path}: deleted")
+        else:
+            byte_diff = d.a_blob.size - d.b_blob.size
+            diff_str = f"+{byte_diff}" if byte_diff >= 0 else f"{byte_diff}"
+            log.debug(f"{d.b_path:<15}: {diff_str} bytes")
+
     actor = Actor("Arkivist", "arkiv@arkiv.arkiv")
     repo.index.commit("update", author=actor, committer=actor)
 
