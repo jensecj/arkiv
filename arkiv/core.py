@@ -1,6 +1,7 @@
 import os
 from urllib.parse import urlparse
 import logging
+import hashlib
 
 from .modules.url2meta import gather_meta
 from .modules.url2links import gather_links
@@ -46,6 +47,10 @@ def _build_archive_dir(url):
 
     # cap the length of the archives name
     archive_dir = archive_dir[:75]
+
+    # add checksum, to ensure we dont overwrite archives from long urls
+    hash = hashlib.md5(url.encode("utf-8")).hexdigest()[:4]
+    archive_dir = f"{archive_dir}={hash}"
 
     return archive_dir
 
