@@ -9,8 +9,8 @@ from ..config import USER_AGENT
 log = logging.getLogger(__name__)
 
 
-def generate_readable(url):
-    log.info("generating readable file...")
+def generate(url):
+    log.info("generating readable...")
 
     headers = requests.utils.default_headers()
     headers.update({"User-Agent": USER_AGENT})
