@@ -51,7 +51,7 @@ def gather_meta(url):
     meta_data = {
         "url": url,
         "title": title,
-        "date": datetime.datetime.utcnow().isoformat(),
+        "timestamp": datetime.datetime.utcnow().isoformat(),
         "first-occurance": first,
     }
 
