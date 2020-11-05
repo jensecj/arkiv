@@ -6,15 +6,16 @@ import hashlib
 import git
 from git import Repo, Actor
 
+from . import generators
+from .generators import readable, monolith, screenshots
+
+
 from .modules.url2meta import gather_meta
 from .modules.url2links import gather_links
 from .modules.url2singlefile import generate_singlefile
-from .modules.url2img import generate_screenshots
 from .modules.url2archive import generate_archive
 from .modules.url2warc import generate_warc
 
-from .modules import readability
-from .modules import monolith
 
 from .modules.links2repos import extract_repos
 from .modules.links2videos import extract_videos
@@ -127,10 +128,10 @@ def archive(config, url):
     # TODO: wrap each section in an error handler
     meta = gather_meta(url)
     links = gather_links(url)
-    generate_screenshots(url)
     # generate_singlefile(url)
-    readability.generate(url)
-    monolith.generate(url)
+    generators.readable.generate(url)
+    generators.monolith.generate(url)
+    generators.screenshots.generate(url)
 
     if links:
         extract_pdfs(config, links)

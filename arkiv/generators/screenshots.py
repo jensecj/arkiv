@@ -7,7 +7,7 @@ from selenium import webdriver
 log = logging.getLogger(__name__)
 
 
-def generate_screenshots(url):
+def generate(url):
     options = webdriver.FirefoxOptions()
     options.set_headless()
 
