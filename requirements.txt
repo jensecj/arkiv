@@ -4,6 +4,7 @@ requests
 beautifulsoup4
 gitpython
 colorlog
+html2text
 
 readability-lxml
 selenium
