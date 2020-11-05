@@ -59,6 +59,8 @@ def archive(config, url):
     log.info(f"archiving {url}")
 
     archive_dir = _build_archive_dir(url)
+    log.debug(f"{archive_dir=}")
+
     if p := config.get("archive"):
         archive_path = os.path.join(os.path.expanduser(p), archive_dir)
     else:
@@ -69,6 +71,10 @@ def archive(config, url):
     if not os.path.isdir(archive_path):
         os.mkdir(archive_path)
 
+    # TODO: if the dir is not a git-repo, initialize it
+    # TODO: if dir is a git-repo, validate that it is a proper archive
+
+    # we change the working dir, so relative outputs land in the correct location
     os.chdir(archive_path)
 
     # TODO: wrap each section in an error handler
@@ -87,5 +93,7 @@ def archive(config, url):
 
     # generate_warc(config, url)
     # generate_archive(config, url)
+
+    # TODO: commit all new files to git-repo
 
     log.info("Archiving complete")
