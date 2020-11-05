@@ -92,9 +92,15 @@ def load():
     config_file = _get_config_file()
     log.debug(f"{config_file=}")
 
+    file_config = _from_file(config_file)
+    log.debug(f"{file_config=}")
+
+    env_config = _from_environment()
+    log.debug(f"{env_config=}")
+
     config = {}
-    config.update(_from_file(config_file))
-    config.update(_from_environment())
+    config.update(file_config)
+    config.update(env_config)
     log.debug(f"{config=}")
 
     return config
