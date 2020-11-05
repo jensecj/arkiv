@@ -17,7 +17,7 @@ def print_version(ctx, param, value):
         return
 
     version = open("__version__.py", "r").read().strip()
-    print(f"arkiver v{version}")
+    print(f"arkiv v{version}")
     ctx.exit()
 
 

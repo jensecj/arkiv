@@ -41,9 +41,9 @@ LOG_CONFIG = {
 
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"
 
-ENV_VERBOSE = "ARKIVER_VERBOSE"
-ENV_CONFIG = "ARKIVER_CONFIG"
-ENV_ARCHIVE = "ARKIVER_ARCHIVE"
+ENV_VERBOSE = "ARKIV_VERBOSE"
+ENV_CONFIG = "ARKIV_CONFIG"
+ENV_ARCHIVE = "ARKIV_ARCHIVE"
 
 
 log = logging.getLogger(__name__)
@@ -52,9 +52,9 @@ log = logging.getLogger(__name__)
 def _get_config_file():
     paths = [
         os.environ.get(ENV_CONFIG),
-        os.path.join(xdg_config_home(), "arkiver/arkiver.conf"),
-        os.path.expanduser("~/.arkiver/arkiver.conf"),
-        os.path.expanduser("~/.arkiver"),
+        os.path.join(xdg_config_home(), "arkiv/arkiv.conf"),
+        os.path.expanduser("~/.arkiv/arkiv.conf"),
+        os.path.expanduser("~/.arkiv"),
     ]
 
     for p in paths:

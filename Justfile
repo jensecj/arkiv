@@ -1,4 +1,4 @@
-package := "arkiver"
+package := "arkiv"
 build_dir := "build/" + package
 
 test:
