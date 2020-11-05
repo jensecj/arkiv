@@ -24,7 +24,7 @@ def _get_first_webarchive_record(url):
     log.debug(f"{wa_url=}")
 
     cmd = ["curl", "-s", wa_url]
-    return_code, stdout, stderr = shell(cmd, log=False)
+    return_code, stdout, stderr = shell(cmd)
 
     if return_code:
         log.warning(f"failed to get first occurance from webarchive, skipping...")
