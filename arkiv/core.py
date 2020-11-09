@@ -9,7 +9,7 @@ from git import Repo, Actor
 from . import extractors
 from .extractors import meta, links, pdfs, arxiv
 from . import generators
-from .generators import readable, monolith, screenshots
+from .generators import readable, monolith, screenshots, tar
 from .utils import time
 
 log = logging.getLogger(__name__)
@@ -122,13 +122,12 @@ def archive(config, url):
     generators.readable.generate(url)
     generators.monolith.generate(url)
     generators.screenshots.generate(url)
+    generators.tar.generate(url)
 
     extractors.pdfs.extract(links)
     extractors.arxiv.extract(links)
 
     # generate_warc(config, url)
-    # generate_archive(config, url)
-
     _commit_archive(archive_path, repo)
 
     log.info("Archiving complete")
