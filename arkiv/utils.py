@@ -1,3 +1,4 @@
+import shutil
 from datetime import datetime
 import subprocess
 import logging
@@ -29,3 +30,32 @@ def shell(cmd):
     stderr = popen.stderr.read() if popen.stderr else None
 
     return return_code, stdout, stderr
+
+
+def wget(url, dest, extra_args=[]):
+    if not shutil.which("wget"):
+        log.error("could not find `wget' executable, skipping.")
+        return
+
+    args = [
+        "--execute",
+        "robots=off",
+        "--no-verbose",
+        "--quiet",
+        "--progress=bar",
+        "--show-progress",
+        "--wait=1",
+        "--random-wait",
+        "--tries=5",
+        "--user-agent=Mozilla",
+        "--no-check-certificate",
+    ]
+
+    cmd = ["wget"] + ["-O", dest] + args + extra_args + [url]
+    return_code, stdout, stderr = shell(cmd)
+
+    if return_code:
+        log.debug(f"{return_code}")
+        log.debug(f"{stdout}")
+        log.debug(f"{stderr}")
+        log.error(f"failed to download {url}")
