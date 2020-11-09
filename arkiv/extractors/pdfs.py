@@ -1,0 +1,33 @@
+import os
+import logging
+from urllib.parse import urlparse
+
+from ..utils import shell, wget
+
+log = logging.getLogger(__name__)
+
+
+def _download_pdf(url):
+    log.info(f"downloading pdf: {url}")
+    base = urlparse(url)
+    basename = os.path.basename(base.path)
+    filename = os.path.join("pdfs", basename)
+
+    if not filename.endswith(".pdf"):
+        filename = filename + ".pdf"
+
+    wget(url, filename)
+
+
+def extract(links):
+    log.info("extracting pdf files...")
+
+    all_links = links["internal"] + links["external"]
+    pdf_links = set([l for l in links if l.endswith(".pdf")])
+
+    if len(pdf_links) > 0:
+        if not os.path.isdir("pdfs"):
+            os.mkdir("pdfs")
+
+    for l in sorted(pdf_links):
+        _download_pdf(l)

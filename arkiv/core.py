@@ -7,8 +7,7 @@ import git
 from git import Repo, Actor
 
 from . import extractors
-from .extractors import meta, links
-
+from .extractors import meta, links, pdfs, arxiv
 from . import generators
 from .generators import readable, monolith, screenshots
 
@@ -19,8 +18,6 @@ from .modules.url2warc import generate_warc
 from .modules.links2repos import extract_repos
 from .modules.links2videos import extract_videos
 from .modules.links2images import extract_images
-from .modules.links2pdfs import extract_pdfs
-
 from .utils import time
 
 log = logging.getLogger(__name__)
@@ -127,18 +124,15 @@ def archive(config, url):
     # we change the working dir, so relative outputs land in the correct location
     os.chdir(archive_path)
 
-    # TODO: wrap each section in an error handler
     meta = extractors.meta.extract(url)
     links = extractors.links.extract(url)
+
     generators.readable.generate(url)
     generators.monolith.generate(url)
     generators.screenshots.generate(url)
 
-    if links:
-        extract_pdfs(config, links)
-        extract_images(links)
-        extract_videos(links)
-        extract_repos(links)
+    extractors.pdfs.extract(links)
+    extractors.arxiv.extract(links)
 
     # generate_warc(config, url)
     # generate_archive(config, url)
