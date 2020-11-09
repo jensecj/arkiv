@@ -9,7 +9,7 @@ from git import Repo, Actor
 from . import extractors
 from .extractors import meta, links, pdfs, arxiv
 from . import generators
-from .generators import readable, monolith, screenshots, tar
+from .generators import readable, monolith, screenshots, tar, warc
 from .utils import time
 
 log = logging.getLogger(__name__)
@@ -123,6 +123,7 @@ def archive(config, url):
     generators.monolith.generate(url)
     generators.screenshots.generate(url)
     generators.tar.generate(url)
+    generators.warc.generate(url)
 
     extractors.pdfs.extract(links)
     extractors.arxiv.extract(links)
