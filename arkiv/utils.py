@@ -1,7 +1,24 @@
+from datetime import datetime
 import subprocess
 import logging
 
+
 log = logging.getLogger(__name__)
+
+
+def time(fn):
+    def wrapper(*args, **kwargs):
+        start_time = datetime.now()
+
+        ret = fn(*args, **kwargs)
+
+        end_time = datetime.now()
+        elapsed = end_time - start_time
+        log.debug(f"fn `{fn.__name__}' completed in {elapsed}")
+
+        return ret
+
+    return wrapper
 
 
 def shell(cmd):

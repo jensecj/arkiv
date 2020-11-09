@@ -21,6 +21,7 @@ from .modules.links2videos import extract_videos
 from .modules.links2images import extract_images
 from .modules.links2pdfs import extract_pdfs
 
+from .utils import time
 
 log = logging.getLogger(__name__)
 
@@ -71,6 +72,7 @@ def _get_archive_repo(archive_path):
     return repo
 
 
+@time
 def _commit_archive(archive_path, repo):
     actor = Actor("Arkivist", "arkiv@arkiv.arkiv")
 
@@ -100,6 +102,7 @@ def _commit_archive(archive_path, repo):
     repo.index.commit("update", author=actor, committer=actor)
 
 
+@time
 def archive(config, url):
     log.info(f"archiving {url}")
 
