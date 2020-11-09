@@ -3,10 +3,12 @@ import logging
 
 from selenium import webdriver
 
+from ..utils import time
 
 log = logging.getLogger(__name__)
 
 
+@time
 def generate(url):
     options = webdriver.FirefoxOptions()
     options.set_headless()

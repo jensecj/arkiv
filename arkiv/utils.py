@@ -46,6 +46,7 @@ def wget(url, dest_file=None, dest_dir=None, extra_args=[]):
         "--wait=1",
         "--random-wait",
         "--tries=5",
+        "--timeout=30",
         "--user-agent=Mozilla",
         "--no-check-certificate",
     ]

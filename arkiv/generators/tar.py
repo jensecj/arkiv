@@ -23,6 +23,8 @@ def _download_mirror(url, dest):
         "--level=1",
     ]
 
+    # TODO: exclude domains
+
     wget(url, dest_dir=dest, extra_args=extra_args)
 
 

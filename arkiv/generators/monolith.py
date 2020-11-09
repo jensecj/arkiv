@@ -1,12 +1,13 @@
 import logging
 import shutil
 
-from ..utils import shell
+from ..utils import shell, time
 
 
 log = logging.getLogger(__name__)
 
 
+@time
 def generate(url):
     log.info("generating monolith...")
     if not shutil.which("monolith"):

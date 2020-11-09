@@ -62,7 +62,6 @@ def _get_archive_repo(archive_path):
     return repo
 
 
-@time
 def _commit_archive(archive_path, repo):
     actor = Actor("Arkivist", "arkiv@arkiv.arkiv")
 

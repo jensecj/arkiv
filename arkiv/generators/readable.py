@@ -5,10 +5,12 @@ import re
 import logging
 
 from ..config import USER_AGENT
+from ..utils import time
 
 log = logging.getLogger(__name__)
 
 
+@time
 def generate(url):
     log.info("generating readable...")
 
