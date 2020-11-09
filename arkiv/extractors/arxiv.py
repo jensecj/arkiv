@@ -8,7 +8,7 @@ log = logging.getLogger(__name__)
 
 
 def _download_pdf(url):
-    log.info(f"downloading arxiv: {url}")
+    log.info(f"- downloading {url}")
 
     base = urlparse(url)
     basename = os.path.basename(base.path)
@@ -21,6 +21,8 @@ def _download_pdf(url):
 
 
 def extract(links):
+    log.info("extracting arxiv...")
+
     all_links = links["internal"] + links["external"]
 
     direct = [l for l in all_links if "arxiv.org/pdf/" in l]

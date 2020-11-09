@@ -49,6 +49,7 @@ def wget(url, dest_file=None, dest_dir=None, extra_args=[]):
         "--timeout=30",
         "--user-agent=Mozilla",
         "--no-check-certificate",
+        "--no-parent",
     ]
 
     if dest_file:
