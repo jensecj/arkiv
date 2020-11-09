@@ -10,14 +10,6 @@ from . import extractors
 from .extractors import meta, links, pdfs, arxiv
 from . import generators
 from .generators import readable, monolith, screenshots
-
-
-from .modules.url2singlefile import generate_singlefile
-from .modules.url2archive import generate_archive
-from .modules.url2warc import generate_warc
-from .modules.links2repos import extract_repos
-from .modules.links2videos import extract_videos
-from .modules.links2images import extract_images
 from .utils import time
 
 log = logging.getLogger(__name__)
