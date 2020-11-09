@@ -32,7 +32,7 @@ def shell(cmd):
     return return_code, stdout, stderr
 
 
-def wget(url, dest, extra_args=[]):
+def wget(url, dest_file=None, dest_dir=None, extra_args=[]):
     if not shutil.which("wget"):
         log.error("could not find `wget' executable, skipping.")
         return
@@ -43,7 +43,6 @@ def wget(url, dest, extra_args=[]):
         "--no-verbose",
         "--quiet",
         "--progress=bar",
-        "--show-progress",
         "--wait=1",
         "--random-wait",
         "--tries=5",
@@ -51,11 +50,49 @@ def wget(url, dest, extra_args=[]):
         "--no-check-certificate",
     ]
 
-    cmd = ["wget"] + ["-O", dest] + args + extra_args + [url]
+    if dest_file:
+        args += ["-O", dest_file]
+
+    if dest_dir:
+        args += [f"--directory-prefix={dest_dir}"]
+
+    cmd = ["wget"] + args + extra_args + [url]
     return_code, stdout, stderr = shell(cmd)
 
+    errors = ["no error", "some files changed", "fatal error"]
+
+    errors = [
+        "no error",
+        "generic error",
+        "parse error",
+        "I/O error",
+        "network failure",
+        "SSL failure",
+        "auth failure",
+        "protocol error",
+        "server error response",
+    ]
+
+    err = errors[return_code]
+
     if return_code:
-        log.debug(f"{return_code}")
-        log.debug(f"{stdout}")
-        log.debug(f"{stderr}")
-        log.error(f"failed to download {url}")
+        log.error(f"failed to download {url}: {err}")
+        log.debug(f"{return_code=}")
+        log.debug(f"{stdout=}")
+        log.debug(f"{stderr=}")
+
+
+def tar(files, dest, extra_args=[]):
+    args = ["-czf"]
+    cmd = ["tar"] + args + extra_args + [dest] + files
+
+    return_code, stdout, stderr = shell(cmd)
+
+    errors = ["no error", "some files changed", "fatal error"]
+    err = errors[return_code]
+
+    if return_code:
+        log.error(f"Failed to compress website into archive: {err}")
+        log.debug(f"{return_code=}")
+        log.debug(f"{stdout=}")
+        log.debug(f"{stderr=}")

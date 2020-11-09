@@ -17,7 +17,7 @@ def _download_pdf(url):
     if not filename.endswith(".pdf"):
         filename = filename + ".pdf"
 
-    wget(url, filename)
+    wget(url, dest_file=filename, extra_args=["--show-progress"])
 
 
 def extract(links):
