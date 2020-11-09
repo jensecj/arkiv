@@ -4,96 +4,44 @@ import subprocess
 import shutil
 import logging
 
-from ..config import USER_AGENT
-from ..utils import shell
+from ..utils import shell, wget, tar, time
 
 log = logging.getLogger(__name__)
 
+TMP_ARCHIVE = "tar_archive_tmp/"
 
-def _download_archive(config, url):
-    log.info("downloading website...")
 
-    args = [
+@time
+def _download_mirror(url, dest):
+    log.info("- downloading website mirror...")
+
+    extra_args = [
         "--convert-links",
         "--span-hosts",
         "--adjust-extension",
-        "-e",
-        "robots=off",
-        "--progress=bar",
-        "--show-progress",
         "--page-requisites",
-        "--no-verbose",
-        "--directory-prefix=archive",
         "--level=1",
-        "--wait=1",
-        "--random-wait",
-        "--user-agent=Mozilla",
     ]
 
-    extra_args = []
-    if config.get("exclude_domains"):
-        domains = ",".join(config["exclude_domains"])
-        extra_args = extra_args + ["--exclude-domains", domains]
-
-    cmd = ["wget"] + args + extra_args + [url]
-
-    return_code, stdout, stderr = shell(cmd)
-
-    if return_code and return_code != 5:
-        errors = [
-            "no error",
-            "generic error",
-            "parse error",
-            "I/O error",
-            "network failure",
-            "SSL failure",
-            "auth failure",
-            "protocol error",
-            "server error response",
-        ]
-
-        err = errors[return_code]
-
-        raise Exception(
-            f"Failed to download website. return code: {return_code} ({err}). stderr: {stderr}"
-        )
-
-    if return_code == 5:
-        log.warning("failed to validate SSL, trying to continue anyway...")
+    wget(url, dest_dir=dest, extra_args=extra_args)
 
 
-def _compress_archive(path):
-    log.info("compressing into archive...")
-
-    args = ["-czf"]
-    cmd = ["tar"] + args + ["archive.tar.gz", path]
-
-    return_code, stdout, stderr = shell(cmd)
-
-    if return_code:
-        errors = ["no error", "some files changed", "fatal error"]
-        err = errors[return_code]
-        raise RuntimeError(
-            f"Failed to compress website into archive. return code: {return_code} ({err}). stderr: {popen.stderr}"
-        )
-    else:
-        try:
-            shutil.rmtree(path)
-        except OSError as e:
-            log.error(
-                "error removing website directory: %s - %s." % (e.filename, e.strerror)
-            )
+def _compress_archive(files, dest):
+    log.info("- compressing into archive...")
+    tar(files, dest)
 
 
-def generate_archive(config, url):
-    log.info("generating website archive...")
+def generate(url):
+    log.info("generating tar archive...")
+
+    mirror_path = os.path.join(os.path.curdir, TMP_ARCHIVE)
+    log.debug(f"{mirror_path=}")
+
+    _download_mirror(url, mirror_path)
+    _compress_archive([mirror_path], "archive.tar.gz")
 
     try:
-        _download_archive(config, url)
-
-        path = os.path.join(os.path.curdir, "archive/")
-        _compress_archive(path)
-    except KeyboardInterrupt:
-        log.info("user interrupted handler, skipping...")
-    except Exception as error:
-        log.error(repr(error))
+        shutil.rmtree(mirror_path)
+    except OSError as e:
+        log.error(f"failed to remove temporary archive dir")
+        log.debug(f"{e.stderror=}")
