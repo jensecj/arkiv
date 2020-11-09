@@ -15,7 +15,7 @@ def time(fn):
 
         end_time = datetime.now()
         elapsed = end_time - start_time
-        log.debug(f"fn `{fn.__name__}' completed in {elapsed}")
+        log.debug(f"`{fn.__module__}.{fn.__qualname__}' took {elapsed}")
 
         return ret
 

@@ -27,6 +27,7 @@ def _build_archive_dir(url):
         archive_dir.replace("www.", "")
         .replace(".html", "")
         .replace(".htm", "")
+        .replace(".gmi", "")
         .replace(".asp", "")
         .replace(".aspx", "")
         .replace(".php", "")
@@ -111,7 +112,7 @@ def archive(config, url):
     repo = _get_archive_repo(archive_path)
 
     if repo.is_dirty(untracked_files=True):
-        log.warning("git repo is dirty!")
+        log.warning("archive repository is dirty")
 
     # we change the working dir, so relative outputs land in the correct location
     os.chdir(archive_path)
@@ -127,7 +128,6 @@ def archive(config, url):
     extractors.pdfs.extract(links)
     extractors.arxiv.extract(links)
 
-    # generate_warc(config, url)
     _commit_archive(archive_path, repo)
 
     log.info("Archiving complete")
