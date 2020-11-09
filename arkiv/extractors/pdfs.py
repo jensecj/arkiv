@@ -23,7 +23,7 @@ def extract(links):
     log.info("extracting pdf files...")
 
     all_links = links["internal"] + links["external"]
-    pdf_links = set([l for l in links if l.endswith(".pdf")])
+    pdf_links = set([l for l in all_links if l.endswith(".pdf")])
 
     if len(pdf_links) > 0:
         if not os.path.isdir("pdfs"):
