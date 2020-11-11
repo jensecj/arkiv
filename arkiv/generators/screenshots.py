@@ -23,14 +23,16 @@ def generate(url):
         driver.get(url)
 
         log.info("generating thumbnail...")
-        driver.save_screenshot("thumb.png")
+        driver.save_screenshot("thumbnail.png")
 
-        log.info("generating <html> image...")
+        width = driver.execute_script("return document.body.parentNode.scrollWidth")
+        height = driver.execute_script("return document.body.parentNode.scrollHeight")
+        # the UI obscures a part of the viewport, need to account for that
+        driver.set_window_size(width, height + 100)
+        log.debug(f"full page size: {width}x{height}")
+
+        log.info("generating page image...")
         html = driver.find_element_by_tag_name("html")
-        html.screenshot("html.png")
-
-        log.info("generating <body> image...")
-        body = driver.find_element_by_tag_name("body")
-        body.screenshot("body.png")
+        html.screenshot("page.png")
 
         driver.delete_all_cookies()
