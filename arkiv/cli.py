@@ -21,7 +21,7 @@ def print_version(ctx, param, value):
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 @click.command(context_settings=CONTEXT_SETTINGS)
 @click.argument("url", type=str)
-@click.option("-v", "--verbose", help="", count=True)
+@click.option("-v", "--verbose", count=True, type=click.IntRange(0, 2))
 @click.option("-V", "--version", is_flag=True, callback=print_version, expose_value=False, is_eager=True,)
 def main(url, verbose):
     verbosity = {
