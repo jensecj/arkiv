@@ -6,6 +6,7 @@ import hashlib
 import git
 from git import Repo, Actor
 
+from .config import CONFIG
 from . import extractors
 from .extractors import meta, links, pdfs, arxiv
 from . import generators
@@ -92,13 +93,13 @@ def _commit_archive(archive_path, repo):
 
 
 @time
-def archive(config, url):
+def archive(url):
     log.info(f"archiving {url}")
 
     archive_dir = _build_archive_dir(url)
     log.debug(f"{archive_dir=}")
 
-    if p := config.get("archive"):
+    if p := CONFIG.get("archive"):
         archive_path = os.path.join(os.path.expanduser(p), archive_dir)
     else:
         archive_path = os.path.abspath(archive_dir)

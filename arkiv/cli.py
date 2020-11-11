@@ -4,7 +4,7 @@ import pkg_resources
 import click
 
 from . import config as CFG
-from .core import archive
+from . import core
 
 log = logging.getLogger(__name__)
 
@@ -32,9 +32,10 @@ def main(url, verbose):
     CFG.LOG_CONFIG.update(verbosity.get(verbose))
     logging.config.dictConfig(CFG.LOG_CONFIG)
 
-    config = CFG.load()
+    CFG.CONFIG.update(CFG.load())
+    CFG.CONFIG.update({"verbosity": verbose})
 
-    archive(config, url)
+    core.archive(url)
 
 
 if __name__ == "__main__":

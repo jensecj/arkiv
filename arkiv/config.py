@@ -52,6 +52,8 @@ LOG_CONFIG = {
     },
 }
 
+CONFIG = {}
+
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"
 
 ENV_CONFIG = "ARKIV_CONFIG"
@@ -74,10 +76,14 @@ def _get_config_file():
         if p and os.path.isfile(p):
             return p  # use the first valid config file
 
+    return os.path.join(xdg_config_home(), "arkiv/arkiv.conf")
+
 
 def _from_file(config_file):
     with open(os.path.expanduser(config_file), "r") as f:
         return json.load(f)
+
+    return {}
 
 
 def _from_environment():
