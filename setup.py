@@ -17,7 +17,7 @@ setup(
     version=version,
     description="Store websites locally, in a variety of formats",
     url="http://github.com/jensecj/arkiv",
-    author="Jens Christian Jensen",
+    author="Jens C. Jensen",
     author_email="jensecj@gmail.com",
     packages=find_packages(),
     entry_points={"console_scripts": ["arkiv = arkiv.cli:main"]},
