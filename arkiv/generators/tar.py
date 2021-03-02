@@ -9,13 +9,13 @@ log = logging.getLogger(__name__)
 
 
 def _download_mirror(url, dest):
-    log.info("- downloading website mirror...")
+    log.info("downloading website mirror...")
 
     extra_args = [
         "--convert-links",
-        "--span-hosts",
+        # "--span-hosts",
         "--adjust-extension",
-        "--page-requisites",
+        # "--page-requisites",
         "--level=1",
     ]
 
@@ -24,7 +24,7 @@ def _download_mirror(url, dest):
 
 
 def _compress_archive(files, dest):
-    log.info("- compressing into archive...")
+    log.info("compressing into archive...")
     try:
         with tempfile.NamedTemporaryFile(suffix=".tar.gz") as tmp:
             with tarfile.open(fileobj=tmp, mode="w:gz") as f:
@@ -32,7 +32,7 @@ def _compress_archive(files, dest):
 
             shutil.copy(tmp.name, "archive.tar.gz")
     except Exception as ex:
-        log.error(f"- [red]failed to compress archive: {ex}")
+        log.error(f"[red]failed to compress archive: {ex}")
 
 
 @profile
@@ -43,4 +43,4 @@ def generate(url):
         if _download_mirror(url, mirror_path):
             _compress_archive(mirror_path, "archive.tar.gz")
         else:
-            log.error("- [red]failed to download mirror")
+            log.error("[red]failed to download mirror")

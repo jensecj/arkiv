@@ -8,7 +8,7 @@ log = logging.getLogger(__name__)
 
 
 def _download_pdf(url):
-    log.info(f"- downloading {url}")
+    log.info(f"downloading {url}")
     base = urlparse(url)
     basename = os.path.basename(base.path)
     filename = os.path.join("pdfs", basename)

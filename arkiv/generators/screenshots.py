@@ -24,10 +24,10 @@ def generate(url):
     ) as driver:
         driver.get(url)
 
-        log.info("- generating thumbnail...")
+        log.info("generating thumbnail...")
         driver.save_screenshot("thumbnail.png")
 
-        log.info("- generating page image...")
+        log.info("generating page image...")
         width = driver.execute_script("return document.body.parentNode.scrollWidth")
         height = driver.execute_script("return document.body.parentNode.scrollHeight")
         # the UI obscures a part of the viewport, need to account for that
