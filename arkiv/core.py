@@ -3,6 +3,7 @@ import json
 from urllib.parse import urlparse
 import logging
 import hashlib
+import concurrent.futures
 
 import git
 from git import Repo, Actor
@@ -88,7 +89,20 @@ def _commit_archive(archive_path, repo):
     repo.index.commit("", author=actor, committer=actor)
 
 
-@time
+def parallelize(tasks):
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = []
+        for fn, args in tasks:
+            futures.append(executor.submit(fn, *args))
+
+        results = []
+        for future in concurrent.futures.as_completed(futures):
+            results.append(future.result())
+
+        return results
+
+
+@profile
 def archive(url):
     log.info(f"archiving {url}")
 
@@ -105,29 +119,63 @@ def archive(url):
     if not os.path.isdir(archive_path):
         os.mkdir(archive_path)
 
+    # change the working dir, so relative outputs land in the correct location
+    os.chdir(archive_path)
 
     if repo := _get_archive_repo(archive_path):
         if repo.is_dirty(untracked_files=True):
             log.warning("archive repository is dirty")
 
-    # we change the working dir, so relative outputs land in the correct location
-    os.chdir(archive_path)
+    results = parallelize(
+        [
+            (extractors.meta.extract, [url]),
+            (extractors.wayback.extract, [url]),
+            (extractors.video.extract, [url]),
+            (extractors.links.extract, [url]),
+        ]
+    )
 
-    meta = extractors.meta.extract(url)
-    links = extractors.links.extract(url)
+    data = {}
 
-    generators.readable.generate(url)
-    generators.monolith.generate(url)
-    generators.screenshots.generate(url)
-    generators.tar.generate(url)
-    generators.warc.generate(url)
+    # TODO: rework parsing parallel extraction results
+    for r in results:
+        if isinstance(r, dict):
+            for k, v in r.items():
+                e = data.get(k) or {}
+                e.update(v)
+                data[k] = e
 
-    extractors.pdfs.extract(links)
-    extractors.arxiv.extract(links)
-    if not repo:
-        log.info("repo does not exist, creating...")
-        repo = Repo.init(archive_path)
+    meta = data.get("meta") or {}
+    links = data.get("links") or {}
 
-    _commit_archive(archive_path, repo)
+    if CONFIG.get("json"):
+        print(json.dumps(data, indent=4, sort_keys=True))
+
+    should_generate = not CONFIG.get("dry-run") and not CONFIG.get("json")
+
+    if should_generate:
+        with open("meta.json", "w") as f:
+            json.dump(meta, f, indent=4, sort_keys=True)
+
+        with open("links.json", "w") as f:
+            json.dump(links, f, indent=4, sort_keys=True)
+
+        parallelize(
+            [
+                (generators.readable.generate, [url]),
+                (generators.monolith.generate, [url]),
+                (generators.screenshots.generate, [url]),
+                (generators.tar.generate, [url]),
+                (generators.warc.generate, [url]),
+                (generators.pdfs.generate, [links]),
+                (generators.arxiv.generate, [links]),
+            ]
+        )
+
+        if not repo:
+            log.info("repo does not exist, creating...")
+            repo = Repo.init(archive_path)
+
+        _commit_archive(archive_path, repo)
 
     log.info("Archiving complete")
