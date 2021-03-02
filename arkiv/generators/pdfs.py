@@ -2,7 +2,7 @@ import os
 import logging
 from urllib.parse import urlparse
 
-from ..utils import shell, wget
+from ..utils import shell, wget, profile
 
 log = logging.getLogger(__name__)
 
@@ -19,8 +19,9 @@ def _download_pdf(url):
     wget(url, dest_file=filename, extra_args=["--show-progress"])
 
 
-def extract(links):
-    log.info("extracting pdf files...")
+@profile
+def generate(links):
+    log.info("generating pdf files...")
 
     all_links = links["internal"] + links["external"]
     pdf_links = set([l for l in all_links if l.endswith(".pdf")])
