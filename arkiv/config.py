@@ -1,39 +1,98 @@
 import os
-import sys
 import json
+import time
 import logging
+from logging import Handler, LogRecord
 
+import rich
+from rich.console import Console
+from rich.table import Table
+from rich.text import Text
 from xdg import xdg_config_home
+
+
+log_console = Console(highlight=False, emoji=False)
+
+
+class LogHandler(Handler):
+    def __init__(
+        self,
+        console=None,
+        level=logging.NOTSET,
+        show_time: bool = False,
+        show_level: bool = False,
+        show_path: bool = False,
+        log_colors: dict[str, str] = None,
+        log_level_colors: dict[str, str] = None,
+    ) -> None:
+        super().__init__(level=level)
+        self.console = console or rich.get_console()
+        self.formatter = self.formatter or logging._defaultFormatter
+        self.show_time = show_time
+        self.show_level = show_level
+        self.show_path = show_path
+        self.log_colors = log_colors or {
+            "time": "blue",
+            "path": "dim white",
+        }
+        self.log_level_colors = log_level_colors or {
+            "INFO": "bold white",
+            "WARNING": "yellow",
+            "DEBUG": "cyan",
+            "ERROR": "red",
+        }
+
+    def emit(self, record: LogRecord) -> None:
+        output = Table.grid(padding=(0, 1))
+        output.expand = True
+        output.add_column()
+        output.add_column()
+        output.add_column()
+        output.add_column(ratio=1, overflow="fold")
+
+        row = []
+
+        log_time = ""
+        if self.show_time:
+            log_time = f"{self.formatter.formatTime(record)}"
+            color = self.log_colors.get("time")
+            row.append(Text(log_time, style=color))
+
+        log_level = ""
+        if self.show_level:
+            log_level = f"{record.levelname:<7}"
+            color = self.log_level_colors.get(record.levelname)
+            row.append(Text(log_level, style=color))
+
+        log_path = ""
+        if self.show_path:
+            log_path = f"{record.name}:{record.lineno}"
+            color = self.log_colors.get("path")
+            row.append(Text(log_path, style=color))
+
+        log_message = record.getMessage()
+        row.append(log_message)
+
+        output.add_row(*row)
+        # items = [*filter(None, [log_time, log_level, log_path, log_message])]
+        # self.console.print(*items)
+        self.console.print(output)
+
 
 LOG_CONFIG = {
     "version": 1,
     "disable_existing_loggers": False,
-    "formatters": {
-        "simple": {"format": "%(message)s"},
-        "standard": {
-            "format": "%(asctime)s [%(levelname)-7s] %(name)s:%(lineno)s: %(message)s"
-        },
-        "colored": {
-            "()": "colorlog.ColoredFormatter",
-            "format": "%(asctime)s %(log_color)s[%(levelname)-7s]%(reset)s %(white)s%(name)s:%(lineno)s%(reset)s: %(message)s",
-            "log_colors": {
-                "DEBUG": "cyan",
-                "INFO": "white",
-                "WARNING": "yellow",
-                "ERROR": "red",
-            },
-        },
-    },
     "handlers": {
         "default": {
-            "formatter": "simple",
-            "class": "logging.StreamHandler",
-            "stream": "ext://sys.stdout",
+            "class": "arkiv.config.LogHandler",
+            "console": log_console,
         },
         "extended": {
-            "formatter": "colored",
-            "class": "logging.StreamHandler",
-            "stream": "ext://sys.stdout",
+            "class": "arkiv.config.LogHandler",
+            "console": log_console,
+            "show_path": True,
+            "show_time": True,
+            "show_level": True,
         },
     },
     "loggers": {
@@ -54,7 +113,7 @@ LOG_CONFIG = {
 
 CONFIG = {}
 
-USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"
+USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36"
 
 ENV_CONFIG = "ARKIV_CONFIG"
 ENV_ARCHIVE = "ARKIV_ARCHIVE"
