@@ -1,22 +1,28 @@
 import shutil
-from datetime import datetime
+import time
 import subprocess
 import logging
 
+from .config import USER_AGENT
 
 log = logging.getLogger(__name__)
 
 
-def time(fn):
+def profile(fn):
     def wrapper(*args, **kwargs):
-        start_time = datetime.now()
-
+        start_time = time.perf_counter_ns()
         ret = fn(*args, **kwargs)
+        end_time = time.perf_counter_ns()
 
-        end_time = datetime.now()
         elapsed = end_time - start_time
-        log.debug(f"`{fn.__module__}.{fn.__qualname__}' took {elapsed}")
 
+        micro, nano = divmod(elapsed, 1000)
+        milli, micro = divmod(micro, 1000)
+        seconds, milli = divmod(milli, 1000)
+
+        log.debug(
+            f"`{fn.__module__}.{fn.__qualname__}' took {seconds}s {milli}ms {micro}μs {nano}ns"
+        )
         return ret
 
     return wrapper
@@ -46,8 +52,8 @@ def wget(url, dest_file=None, dest_dir=None, extra_args=[]):
         "--wait=1",
         "--random-wait",
         "--tries=5",
-        "--timeout=30",
-        "--user-agent=Mozilla",
+        "--timeout=10",
+        "--user-agent=" + f"'{USER_AGENT}'",
         "--no-check-certificate",
         "--no-parent",
     ]
@@ -83,18 +89,4 @@ def wget(url, dest_file=None, dest_dir=None, extra_args=[]):
         log.debug(f"{stdout=}")
         log.debug(f"{stderr=}")
 
-
-def tar(files, dest, extra_args=[]):
-    args = ["-czf"]
-    cmd = ["tar"] + args + extra_args + [dest] + files
-
-    return_code, stdout, stderr = shell(cmd)
-
-    errors = ["no error", "some files changed", "fatal error"]
-    err = errors[return_code]
-
-    if return_code:
-        log.error(f"Failed to compress website into archive: {err}")
-        log.debug(f"{return_code=}")
-        log.debug(f"{stdout=}")
-        log.debug(f"{stderr=}")
+    return return_code == 0
