@@ -5,6 +5,9 @@ beautifulsoup4
 gitpython
 colorlog
 html2text
+rich
 
+youtube-dl
+waybackpy
 readability-lxml
 selenium
