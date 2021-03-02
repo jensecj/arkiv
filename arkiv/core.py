@@ -1,4 +1,5 @@
 import os
+import json
 from urllib.parse import urlparse
 import logging
 import hashlib
@@ -8,10 +9,10 @@ from git import Repo, Actor
 
 from .config import CONFIG
 from . import extractors
-from .extractors import meta, links, pdfs, arxiv
+from .extractors import meta, links, wayback, video
 from . import generators
-from .generators import readable, monolith, screenshots, tar, warc
-from .utils import time
+from .generators import readable, monolith, screenshots, tar, warc, pdfs, arxiv
+from .utils import profile
 
 log = logging.getLogger(__name__)
 
@@ -53,14 +54,9 @@ def _build_archive_dir(url):
 
 def _get_archive_repo(archive_path):
     try:
-        repo = Repo(archive_path)
+        return Repo(archive_path)
     except git.exc.InvalidGitRepositoryError:
-        log.info("repo does not exist, creating...")
-        repo = Repo.init(archive_path)
-
-    # TODO: if dir is a git-repo, validate that it is a proper archive
-
-    return repo
+        pass
 
 
 def _commit_archive(archive_path, repo):
@@ -89,7 +85,7 @@ def _commit_archive(archive_path, repo):
             diff_str = f"+{byte_diff}" if byte_diff >= 0 else f"{byte_diff}"
             log.debug(f"{d.b_path:<15}: {diff_str} bytes")
 
-    repo.index.commit("update", author=actor, committer=actor)
+    repo.index.commit("", author=actor, committer=actor)
 
 
 @time
@@ -109,10 +105,10 @@ def archive(url):
     if not os.path.isdir(archive_path):
         os.mkdir(archive_path)
 
-    repo = _get_archive_repo(archive_path)
 
-    if repo.is_dirty(untracked_files=True):
-        log.warning("archive repository is dirty")
+    if repo := _get_archive_repo(archive_path):
+        if repo.is_dirty(untracked_files=True):
+            log.warning("archive repository is dirty")
 
     # we change the working dir, so relative outputs land in the correct location
     os.chdir(archive_path)
@@ -128,6 +124,9 @@ def archive(url):
 
     extractors.pdfs.extract(links)
     extractors.arxiv.extract(links)
+    if not repo:
+        log.info("repo does not exist, creating...")
+        repo = Repo.init(archive_path)
 
     _commit_archive(archive_path, repo)
 
