@@ -2,13 +2,13 @@ import sys
 import subprocess
 import logging
 
-from ..utils import shell, wget, time
+from ..utils import shell, wget, profile
 
 
 log = logging.getLogger(__name__)
 
 
-@time
+@profile
 def generate(url):
     log.info("generating WARC...")
 

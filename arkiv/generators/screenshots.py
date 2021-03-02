@@ -3,13 +3,15 @@ import logging
 
 from selenium import webdriver
 
-from ..utils import time
+from ..utils import profile
 
 log = logging.getLogger(__name__)
 
 
-@time
+@profile
 def generate(url):
+    log.info("generating screenshots...")
+
     options = webdriver.FirefoxOptions()
     options.set_headless()
 
@@ -22,16 +24,16 @@ def generate(url):
     ) as driver:
         driver.get(url)
 
-        log.info("generating thumbnail...")
+        log.info("- generating thumbnail...")
         driver.save_screenshot("thumbnail.png")
 
+        log.info("- generating page image...")
         width = driver.execute_script("return document.body.parentNode.scrollWidth")
         height = driver.execute_script("return document.body.parentNode.scrollHeight")
         # the UI obscures a part of the viewport, need to account for that
         driver.set_window_size(width, height + 100)
         log.debug(f"full page size: {width}x{height}")
 
-        log.info("generating page image...")
         html = driver.find_element_by_tag_name("html")
         html.screenshot("page.png")
 
