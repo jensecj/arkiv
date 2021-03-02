@@ -46,16 +46,18 @@ def wget(url, dest_file=None, dest_dir=None, extra_args=[]):
     args = [
         "--execute",
         "robots=off",
-        "--no-verbose",
         "--quiet",
-        "--progress=bar",
+        "--no-verbose",
+        "--no-cache",
+        "--no-cookies",
         "--wait=1",
         "--random-wait",
         "--tries=5",
         "--timeout=10",
-        "--user-agent=" + f"'{USER_AGENT}'",
+        f"--user-agent='{USER_AGENT}'",
         "--no-check-certificate",
         "--no-parent",
+        "--content-on-error",
     ]
 
     if dest_file:
@@ -67,9 +69,7 @@ def wget(url, dest_file=None, dest_dir=None, extra_args=[]):
     cmd = ["wget"] + args + extra_args + [url]
     return_code, stdout, stderr = shell(cmd)
 
-    errors = ["no error", "some files changed", "fatal error"]
-
-    errors = [
+    wget_errors = [
         "no error",
         "generic error",
         "parse error",
@@ -81,10 +81,11 @@ def wget(url, dest_file=None, dest_dir=None, extra_args=[]):
         "server error response",
     ]
 
-    err = errors[return_code]
+    wget_err = wget_errors[return_code]
 
     if return_code:
-        log.error(f"failed to download {url}: {err}")
+        log.error(f"failed to download {url}: {wget_err}")
+        log.debug(f"{wget_err=}")
         log.debug(f"{return_code=}")
         log.debug(f"{stdout=}")
         log.debug(f"{stderr=}")
