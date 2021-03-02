@@ -1,17 +1,13 @@
-import os
-import sys
-import subprocess
-import shutil
 import logging
+import tempfile
+import tarfile
+import shutil
 
-from ..utils import shell, wget, tar, time
+from ..utils import shell, wget, profile
 
 log = logging.getLogger(__name__)
 
-TMP_ARCHIVE = "tar_archive_tmp/"
 
-
-@time
 def _download_mirror(url, dest):
     log.info("- downloading website mirror...")
 
@@ -24,26 +20,27 @@ def _download_mirror(url, dest):
     ]
 
     # TODO: exclude domains
-
-    wget(url, dest_dir=dest, extra_args=extra_args)
+    return wget(url, dest_dir=dest, extra_args=extra_args)
 
 
 def _compress_archive(files, dest):
     log.info("- compressing into archive...")
-    tar(files, dest)
+    try:
+        with tempfile.NamedTemporaryFile(suffix=".tar.gz") as tmp:
+            with tarfile.open(fileobj=tmp, mode="w:gz") as f:
+                f.add(files, arcname=".")
+
+            shutil.copy(tmp.name, "archive.tar.gz")
+    except Exception as ex:
+        log.error(f"- [red]failed to compress archive: {ex}")
 
 
+@profile
 def generate(url):
     log.info("generating tar archive...")
 
-    mirror_path = os.path.join(os.path.curdir, TMP_ARCHIVE)
-    log.debug(f"{mirror_path=}")
-
-    _download_mirror(url, mirror_path)
-    _compress_archive([mirror_path], "archive.tar.gz")
-
-    try:
-        shutil.rmtree(mirror_path)
-    except OSError as e:
-        log.error(f"failed to remove temporary archive dir")
-        log.debug(f"{e.stderror=}")
+    with tempfile.TemporaryDirectory() as mirror_path:
+        if _download_mirror(url, mirror_path):
+            _compress_archive(mirror_path, "archive.tar.gz")
+        else:
+            log.error("- [red]failed to download mirror")
