@@ -1,4 +1,3 @@
-import json
 import logging
 
 from bs4 import BeautifulSoup
@@ -6,10 +5,12 @@ import urllib.request
 from urllib.parse import urlparse, urljoin
 
 from ..config import USER_AGENT
+from ..utils import profile
 
 log = logging.getLogger(__name__)
 
 
+@profile
 def extract(url):
     log.info("extracting links...")
 
@@ -28,8 +29,5 @@ def extract(url):
     internal = sorted(set([l for l in links if base in l]))
     external = sorted(set([l for l in links if base not in l]))
 
-    all_links = {"internal": internal, "external": external}
-    with open("links.json", "w") as f:
-        json.dump(all_links, f, indent=4)
-
+    all_links = {"links": {"internal": internal, "external": external}}
     return all_links if (internal or external) else None
